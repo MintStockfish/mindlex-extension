@@ -20,6 +20,8 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "@mantine/core": "^9.3.1",
+    "@mantine/hooks": "9.3.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
