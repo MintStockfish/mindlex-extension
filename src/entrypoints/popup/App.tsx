@@ -7,31 +7,16 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { useState } from 'react';
 import { MindlexLogo } from '../../components/MindlexLogo';
+import { useExtensionSettings } from '../../hooks/useExtensionSettings';
+import { LANGUAGE_OPTIONS } from '../../shared/languages';
+import { POPUP_COPY } from '../../shared/popup';
+import { PROVIDER_LABELS } from '../../shared/settings';
 import './App.css';
 
-const languages = [
-  { value: 'English', label: 'English' },
-  { value: 'German', label: 'German' },
-  { value: 'Spanish', label: 'Spanish' },
-  { value: 'French', label: 'French' },
-  { value: 'Italian', label: 'Italian' },
-  { value: 'Polish', label: 'Polish' },
-  { value: 'Japanese', label: 'Japanese' },
-  { value: 'Chinese', label: 'Chinese' },
-  { value: 'Belarusian', label: 'Belarusian' },
-  { value: 'Russian', label: 'Russian' },
-];
-
 function App() {
-  const [sourceLanguage, setSourceLanguage] = useState<string | null>(
-    'English',
-  );
-  const [targetLanguage, setTargetLanguage] = useState<string | null>(
-    'Russian',
-  );
-  const modelName = 'gpt-4.1-mini';
+  const { settings, isHydrated, setSourceLanguage, setTargetLanguage } =
+    useExtensionSettings();
 
   return (
     <main className="popup-shell">
@@ -46,32 +31,37 @@ function App() {
 
           <div className="popup-hero">
             <Title order={3} className="popup-title">
-              Перевод и захват лексики
+              {POPUP_COPY.title}
             </Title>
           </div>
 
           <div className="popup-meta-grid">
             <div className="popup-meta-card">
-              <Text className="popup-meta-label">Provider</Text>
-              <Text className="popup-meta-value">OpenAI</Text>
+              <Text className="popup-meta-label">
+                {POPUP_COPY.providerLabel}
+              </Text>
+              <Text className="popup-meta-value">
+                {PROVIDER_LABELS[settings.provider]}
+              </Text>
             </div>
             <div className="popup-meta-card">
-              <Text className="popup-meta-label">Model</Text>
-              <Text className="popup-meta-value">{modelName}</Text>
+              <Text className="popup-meta-label">{POPUP_COPY.modelLabel}</Text>
+              <Text className="popup-meta-value">{settings.modelName}</Text>
             </div>
           </div>
 
           <Stack gap={14} className="popup-controls">
             <div className="popup-field">
               <Text size="sm" fw={500} c="white" mb={6}>
-                Исходный язык
+                {POPUP_COPY.sourceLanguageLabel}
               </Text>
               <Select
+                disabled={!isHydrated}
                 searchable
-                data={languages}
-                value={sourceLanguage}
+                data={LANGUAGE_OPTIONS}
+                value={settings.sourceLanguage}
                 onChange={setSourceLanguage}
-                placeholder="Select language..."
+                placeholder={POPUP_COPY.selectLanguagePlaceholder}
                 classNames={{
                   input: 'mindlex-select-input',
                   dropdown: 'mindlex-select-dropdown',
@@ -82,14 +72,15 @@ function App() {
 
             <div className="popup-field">
               <Text size="sm" fw={500} c="white" mb={6}>
-                Язык перевода
+                {POPUP_COPY.targetLanguageLabel}
               </Text>
               <Select
+                disabled={!isHydrated}
                 searchable
-                data={languages}
-                value={targetLanguage}
+                data={LANGUAGE_OPTIONS}
+                value={settings.targetLanguage}
                 onChange={setTargetLanguage}
-                placeholder="Select language..."
+                placeholder={POPUP_COPY.selectLanguagePlaceholder}
                 classNames={{
                   input: 'mindlex-select-input',
                   dropdown: 'mindlex-select-dropdown',
@@ -105,7 +96,7 @@ function App() {
             className="popup-settings-button"
             disabled
           >
-            Open settings
+            {POPUP_COPY.settingsButtonLabel}
           </Button>
         </Stack>
       </Paper>

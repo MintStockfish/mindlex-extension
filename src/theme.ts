@@ -24,21 +24,4 @@ export const mindlexTheme = createTheme({
       '#164e63',
     ],
   },
-  components: {
-    Button: {
-      defaultProps: {
-        radius: 'md',
-      },
-    },
-    Select: {
-      defaultProps: {
-        radius: 'md',
-      },
-    },
-    Combobox: {
-      defaultProps: {
-        radius: 'md',
-      },
-    },
-  },
 });
