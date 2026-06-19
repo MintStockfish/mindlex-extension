@@ -15,7 +15,7 @@ import { PROVIDER_LABELS } from '../../shared/settings';
 import './App.css';
 
 function App() {
-  const { settings, isHydrated, setSourceLanguage, setTargetLanguage } =
+  const { settings, isLoaded, setSourceLanguage, setTargetLanguage } =
     useExtensionSettings();
 
   return (
@@ -56,7 +56,7 @@ function App() {
                 {POPUP_COPY.sourceLanguageLabel}
               </Text>
               <Select
-                disabled={!isHydrated}
+                disabled={!isLoaded}
                 searchable
                 data={LANGUAGE_OPTIONS}
                 value={settings.sourceLanguage}
@@ -75,7 +75,7 @@ function App() {
                 {POPUP_COPY.targetLanguageLabel}
               </Text>
               <Select
-                disabled={!isHydrated}
+                disabled={!isLoaded}
                 searchable
                 data={LANGUAGE_OPTIONS}
                 value={settings.targetLanguage}

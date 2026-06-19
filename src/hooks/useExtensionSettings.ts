@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { isLanguageCode } from '../shared/languages';
 import {
   DEFAULT_EXTENSION_SETTINGS,
-  EXTENSION_SETTINGS_STORAGE_KEY,
   type ExtensionSettings,
 } from '../shared/settings';
+import {
+  getSettings,
+  saveSettings,
+} from '@/shared/storage/extensionSettings.ts';
 
 function isStoredSettings(value: unknown): value is Partial<ExtensionSettings> {
   return typeof value === 'object' && value !== null;
@@ -14,19 +17,16 @@ export function useExtensionSettings() {
   const [settings, setSettings] = useState<ExtensionSettings>(
     DEFAULT_EXTENSION_SETTINGS,
   );
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     let isActive = true;
 
-    void browser.storage.local
-      .get(EXTENSION_SETTINGS_STORAGE_KEY)
-      .then((result) => {
+    getSettings()
+      .then((storedSettings) => {
         if (!isActive) {
           return;
         }
-
-        const storedSettings = result[EXTENSION_SETTINGS_STORAGE_KEY];
 
         if (isStoredSettings(storedSettings)) {
           setSettings({
@@ -35,11 +35,11 @@ export function useExtensionSettings() {
           });
         }
 
-        setIsHydrated(true);
+        setIsLoaded(true);
       })
       .catch(() => {
         if (isActive) {
-          setIsHydrated(true);
+          setIsLoaded(true);
         }
       });
 
@@ -49,14 +49,12 @@ export function useExtensionSettings() {
   }, []);
 
   useEffect(() => {
-    if (!isHydrated) {
+    if (!isLoaded) {
       return;
     }
 
-    void browser.storage.local.set({
-      [EXTENSION_SETTINGS_STORAGE_KEY]: settings,
-    });
-  }, [isHydrated, settings]);
+    void saveSettings(settings);
+  }, [isLoaded, settings]);
 
   const updateLanguage = (
     key: 'sourceLanguage' | 'targetLanguage',
@@ -74,7 +72,7 @@ export function useExtensionSettings() {
 
   return {
     settings,
-    isHydrated,
+    isLoaded,
     setSourceLanguage: (value: string | null) => {
       updateLanguage('sourceLanguage', value);
     },
