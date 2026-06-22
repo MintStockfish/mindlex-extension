@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
-import { isLanguageCode } from '../shared/languages';
+import { isLanguageCode } from '@/shared/languages';
 import {
   DEFAULT_EXTENSION_SETTINGS,
   type ExtensionSettings,
-} from '../shared/settings';
-import {
-  getSettings,
-  saveSettings,
-} from '@/shared/storage/extensionSettings.ts';
+} from '@/shared/settings';
+import { getSettings, saveSettings } from '@/shared/storage/extensionSettings';
 
 function isStoredSettings(value: unknown): value is Partial<ExtensionSettings> {
   return typeof value === 'object' && value !== null;

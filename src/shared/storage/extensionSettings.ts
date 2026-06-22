@@ -2,8 +2,8 @@ import { storage } from 'wxt/utils/storage';
 import {
   DEFAULT_EXTENSION_SETTINGS,
   EXTENSION_SETTINGS_STORAGE_KEY,
-  ExtensionSettings,
-} from '../settings';
+  type ExtensionSettings,
+} from '@/shared/settings';
 
 const settings = storage.defineItem<ExtensionSettings>(
   `local:${EXTENSION_SETTINGS_STORAGE_KEY}`,

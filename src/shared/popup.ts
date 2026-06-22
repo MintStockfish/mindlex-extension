@@ -1,7 +1,7 @@
 export const POPUP_COPY = {
   title: 'Перевод и захват лексики',
-  providerLabel: 'Provider',
-  modelLabel: 'Model',
+  providerLabel: 'Провайдер',
+  modelLabel: 'Модель',
   sourceLanguageLabel: 'Исходный язык',
   targetLanguageLabel: 'Язык перевода',
   selectLanguagePlaceholder: 'Выберите язык...',

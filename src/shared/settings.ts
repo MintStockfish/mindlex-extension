@@ -1,4 +1,4 @@
-import type { LanguageCode } from './languages';
+import type { LanguageCode } from '@/shared/languages';
 
 export const EXTENSION_SETTINGS_STORAGE_KEY = 'mindlex.extension-settings';
 
