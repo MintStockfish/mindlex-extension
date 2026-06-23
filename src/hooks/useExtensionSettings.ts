@@ -2,26 +2,10 @@ import { useEffect, useState } from 'react';
 import { isLanguageCode } from '@/shared/languages';
 import {
   DEFAULT_EXTENSION_SETTINGS,
+  normalizeSettings,
   type ExtensionSettings,
 } from '@/shared/settings';
 import { getSettings, saveSettings } from '@/shared/storage/extensionSettings';
-
-const EXTENSION_SETTINGS_KEYS = [
-  'provider',
-  'modelName',
-  'sourceLanguage',
-  'targetLanguage',
-] as const satisfies ReadonlyArray<keyof ExtensionSettings>;
-
-function isExtensionSettingsLike(
-  value: unknown,
-): value is Partial<ExtensionSettings> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    EXTENSION_SETTINGS_KEYS.some((key) => key in value)
-  );
-}
 
 export function useExtensionSettings() {
   const [settings, setSettings] = useState<ExtensionSettings>(
@@ -32,13 +16,7 @@ export function useExtensionSettings() {
   useEffect(() => {
     getSettings()
       .then((storedSettings) => {
-        if (isExtensionSettingsLike(storedSettings)) {
-          setSettings({
-            ...DEFAULT_EXTENSION_SETTINGS,
-            ...storedSettings,
-          });
-        }
-
+        setSettings(normalizeSettings(storedSettings));
         setIsLoaded(true);
       })
       .catch(() => {
