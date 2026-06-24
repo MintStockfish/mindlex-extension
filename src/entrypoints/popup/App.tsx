@@ -2,7 +2,7 @@ import { Button, Paper, Stack, Text, Title } from '@mantine/core';
 import { LanguageSelectField } from '@/components/LanguageSelectField';
 import { MindlexLogo } from '@/components/MindlexLogo';
 import { useExtensionSettings } from '@/hooks/useExtensionSettings';
-import { POPUP_COPY } from '@/shared/popup';
+import { POPUP_TEXT } from '@/shared/popup';
 import { PROVIDER_LABELS } from '@/shared/settings';
 import './App.css';
 
@@ -20,38 +20,40 @@ function App() {
           </div>
 
           <Title order={3} className="popup-title">
-            {POPUP_COPY.title}
+            {POPUP_TEXT.title}
           </Title>
 
           <div className="popup-meta-grid">
             <div className="popup-meta-card">
               <Text className="popup-meta-label">
-                {POPUP_COPY.providerLabel}
+                {POPUP_TEXT.providerLabel}
               </Text>
               <Text className="popup-meta-value">
                 {PROVIDER_LABELS[settings.provider]}
               </Text>
             </div>
             <div className="popup-meta-card">
-              <Text className="popup-meta-label">{POPUP_COPY.modelLabel}</Text>
+              <Text className="popup-meta-label">{POPUP_TEXT.modelLabel}</Text>
               <Text className="popup-meta-value">{settings.modelName}</Text>
             </div>
           </div>
 
           <Stack gap={14}>
             <LanguageSelectField
-              label={POPUP_COPY.sourceLanguageLabel}
+              label={POPUP_TEXT.sourceLanguageLabel}
               value={settings.sourceLanguage}
               onChange={setSourceLanguage}
               disabled={!isLoaded}
-              placeholder={POPUP_COPY.selectLanguagePlaceholder}
+              loading={!isLoaded}
+              placeholder={POPUP_TEXT.selectLanguagePlaceholder}
             />
             <LanguageSelectField
-              label={POPUP_COPY.targetLanguageLabel}
+              label={POPUP_TEXT.targetLanguageLabel}
               value={settings.targetLanguage}
               onChange={setTargetLanguage}
               disabled={!isLoaded}
-              placeholder={POPUP_COPY.selectLanguagePlaceholder}
+              loading={!isLoaded}
+              placeholder={POPUP_TEXT.selectLanguagePlaceholder}
             />
           </Stack>
 
@@ -61,7 +63,7 @@ function App() {
             className="popup-settings-button"
             disabled
           >
-            {POPUP_COPY.settingsButtonLabel}
+            {POPUP_TEXT.settingsButtonLabel}
           </Button>
         </Stack>
       </Paper>

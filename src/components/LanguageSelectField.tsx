@@ -7,6 +7,7 @@ type LanguageSelectFieldProps = {
   value: LanguageCode;
   onChange: (value: string | null) => void;
   disabled?: boolean;
+  loading?: boolean;
   placeholder?: string;
 };
 
@@ -15,6 +16,7 @@ export function LanguageSelectField({
   value,
   onChange,
   disabled,
+  loading = false,
   placeholder,
 }: LanguageSelectFieldProps) {
   return (
@@ -28,6 +30,7 @@ export function LanguageSelectField({
         data={LANGUAGE_OPTIONS}
         value={value}
         onChange={onChange}
+        loading={loading}
         placeholder={placeholder}
         classNames={{
           input: 'language-select-input',

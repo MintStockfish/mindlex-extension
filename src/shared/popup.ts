@@ -1,4 +1,4 @@
-export const POPUP_COPY = {
+export const POPUP_TEXT = {
   title: 'Перевод и захват лексики',
   providerLabel: 'Провайдер',
   modelLabel: 'Модель',

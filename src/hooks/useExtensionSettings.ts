@@ -6,7 +6,9 @@ import {
 } from '@/shared/settings';
 import { getSettings, saveSettings } from '@/shared/storage/extensionSettings';
 
-function isStoredSettings(value: unknown): value is Partial<ExtensionSettings> {
+function isExtensionSettingsLike(
+  value: unknown,
+): value is Partial<ExtensionSettings> {
   return typeof value === 'object' && value !== null;
 }
 
@@ -17,15 +19,15 @@ export function useExtensionSettings() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    let isActive = true;
+    let shouldUpdateState = true;
 
     getSettings()
       .then((storedSettings) => {
-        if (!isActive) {
+        if (!shouldUpdateState) {
           return;
         }
 
-        if (isStoredSettings(storedSettings)) {
+        if (isExtensionSettingsLike(storedSettings)) {
           setSettings({
             ...DEFAULT_EXTENSION_SETTINGS,
             ...storedSettings,
@@ -35,13 +37,13 @@ export function useExtensionSettings() {
         setIsLoaded(true);
       })
       .catch(() => {
-        if (isActive) {
+        if (shouldUpdateState) {
           setIsLoaded(true);
         }
       });
 
     return () => {
-      isActive = false;
+      shouldUpdateState = false;
     };
   }, []);
 
