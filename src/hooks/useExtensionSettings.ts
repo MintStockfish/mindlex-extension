@@ -6,10 +6,21 @@ import {
 } from '@/shared/settings';
 import { getSettings, saveSettings } from '@/shared/storage/extensionSettings';
 
+const EXTENSION_SETTINGS_KEYS = [
+  'provider',
+  'modelName',
+  'sourceLanguage',
+  'targetLanguage',
+] as const satisfies ReadonlyArray<keyof ExtensionSettings>;
+
 function isExtensionSettingsLike(
   value: unknown,
 ): value is Partial<ExtensionSettings> {
-  return typeof value === 'object' && value !== null;
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    EXTENSION_SETTINGS_KEYS.some((key) => key in value)
+  );
 }
 
 export function useExtensionSettings() {
