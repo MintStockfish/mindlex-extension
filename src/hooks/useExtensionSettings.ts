@@ -30,14 +30,8 @@ export function useExtensionSettings() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    let shouldUpdateState = true;
-
     getSettings()
       .then((storedSettings) => {
-        if (!shouldUpdateState) {
-          return;
-        }
-
         if (isExtensionSettingsLike(storedSettings)) {
           setSettings({
             ...DEFAULT_EXTENSION_SETTINGS,
@@ -48,14 +42,8 @@ export function useExtensionSettings() {
         setIsLoaded(true);
       })
       .catch(() => {
-        if (shouldUpdateState) {
-          setIsLoaded(true);
-        }
+        setIsLoaded(true);
       });
-
-    return () => {
-      shouldUpdateState = false;
-    };
   }, []);
 
   useEffect(() => {
