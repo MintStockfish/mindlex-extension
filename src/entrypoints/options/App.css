@@ -1,0 +1,68 @@
+.options-shell {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(8, 145, 178, 0.1), transparent 210px), #08090b;
+}
+
+.options-panel {
+  background: #101419;
+  border-color: rgba(34, 211, 238, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 18px 42px rgba(0, 0, 0, 0.26);
+  overflow: hidden;
+}
+
+.provider-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.provider-card {
+  min-height: 44px;
+  padding: 10px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #151a20;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.provider-card:hover {
+  border-color: rgba(34, 211, 238, 0.28);
+  background: #182029;
+}
+
+.provider-card[data-checked] {
+  border-color: rgba(34, 211, 238, 0.62);
+  background: #10232c;
+  box-shadow: inset 0 0 0 1px rgba(34, 211, 238, 0.12);
+}
+
+.provider-card-label {
+  overflow: hidden;
+  color: #eef7fa;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.save-status {
+  min-height: 20px;
+  line-height: 20px;
+  margin-top: -4px;
+}
+
+@media (max-width: 520px) {
+  .options-shell {
+    min-width: 340px;
+  }
+
+  .provider-grid {
+    grid-template-columns: 1fr;
+  }
+}

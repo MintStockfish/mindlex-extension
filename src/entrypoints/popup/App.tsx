@@ -10,6 +10,12 @@ function App() {
   const { settings, isLoaded, setSourceLanguage, setTargetLanguage } =
     useExtensionSettings();
 
+  const openSettings = () => {
+    void browser.runtime.openOptionsPage();
+  };
+
+  const activeProviderConfig = settings.providers[settings.activeProvider];
+
   return (
     <main className="popup-shell">
       <Paper className="popup-panel" p="lg">
@@ -29,12 +35,14 @@ function App() {
                 {POPUP_TEXT.providerLabel}
               </Text>
               <Text className="popup-meta-value">
-                {PROVIDER_LABELS[settings.provider]}
+                {PROVIDER_LABELS[settings.activeProvider]}
               </Text>
             </div>
             <div className="popup-meta-card">
               <Text className="popup-meta-label">{POPUP_TEXT.modelLabel}</Text>
-              <Text className="popup-meta-value">{settings.modelName}</Text>
+              <Text className="popup-meta-value">
+                {activeProviderConfig.modelId}
+              </Text>
             </div>
           </div>
 
@@ -61,7 +69,7 @@ function App() {
             fullWidth
             color="cyan"
             className="popup-settings-button"
-            disabled
+            onClick={openSettings}
           >
             {POPUP_TEXT.settingsButtonLabel}
           </Button>
