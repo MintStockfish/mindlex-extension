@@ -1,1 +1,1 @@
-export default defineBackground(() => {});
+export { default } from './background/background';
