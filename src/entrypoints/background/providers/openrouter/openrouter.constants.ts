@@ -8,5 +8,5 @@ export const OPENROUTER_RETRY_LIMIT = 3;
 export const OPENROUTER_RETRY_METHODS = ['post'] as const;
 
 export const OPENROUTER_RETRY_STATUS_CODES = [
-  408, 413, 429, 500, 502, 503, 504,
+  408, 429, 500, 502, 503, 504,
 ] as const;

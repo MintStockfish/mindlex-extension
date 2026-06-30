@@ -10,8 +10,8 @@ import {
   OPENROUTER_RETRY_STATUS_CODES,
 } from './openrouter.constants';
 import type {
-  OpenRouterChatCompletionData,
   OpenRouterChatCompletionResponse,
+  OpenRouterChatCompletionRequestBody,
   OpenRouterChatCompletionResult,
   OpenRouterProviderConfig,
 } from './openrouter.types';
@@ -37,8 +37,8 @@ export class OpenRouterProvider implements TranslationProvider {
       return configError;
     }
 
-    const data = this.createRequestData(input);
-    const response = await this.fetchChatCompletion(data);
+    const body = this.createRequestBody(input);
+    const response = await this.fetchChatCompletion(body);
 
     if (!response.ok) {
       return response;
@@ -69,17 +69,18 @@ export class OpenRouterProvider implements TranslationProvider {
     };
   }
 
-  private createRequestData(
+  private createRequestBody(
     input: ProviderTranslateInput,
-  ): OpenRouterChatCompletionData {
+  ): OpenRouterChatCompletionRequestBody {
     return {
       model: this.config.modelId,
       messages: createTranslationMessages(input),
+      stream: false,
     };
   }
 
   private async fetchChatCompletion(
-    data: OpenRouterChatCompletionData,
+    body: OpenRouterChatCompletionRequestBody,
   ): Promise<OpenRouterChatCompletionResult> {
     try {
       const rawProviderResponse = await ky
@@ -87,10 +88,7 @@ export class OpenRouterProvider implements TranslationProvider {
           headers: {
             Authorization: `Bearer ${this.config.apiKey}`,
           },
-          json: {
-            ...data,
-            stream: false,
-          },
+          json: body,
           retry: {
             limit: OPENROUTER_RETRY_LIMIT,
             methods: [...OPENROUTER_RETRY_METHODS],

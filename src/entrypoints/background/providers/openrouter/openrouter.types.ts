@@ -8,9 +8,10 @@ export type OpenRouterProviderConfig = {
   modelId: string;
 };
 
-export type OpenRouterChatCompletionData = {
+export type OpenRouterChatCompletionRequestBody = {
   model: string;
   messages: ChatCompletionMessage[];
+  stream: false;
 };
 
 export type OpenRouterChatCompletionResult =

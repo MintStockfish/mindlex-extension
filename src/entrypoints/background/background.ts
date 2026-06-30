@@ -2,6 +2,7 @@ import { getSettings } from '@/shared/storage/extensionSettings';
 import {
   isTranslateTextMessage,
   TRANSLATE_TEXT_ERROR_CODE,
+  type TranslateTextRequest,
   type TranslateTextResponse,
 } from '@/shared/translation';
 import { translateText } from './translation/translateText';
@@ -21,7 +22,7 @@ export default defineBackground(() => {
 });
 
 async function handleTranslateTextMessage(
-  request: Parameters<typeof translateText>[0],
+  request: TranslateTextRequest,
 ): Promise<TranslateTextResponse> {
   try {
     const settings = await getSettings();

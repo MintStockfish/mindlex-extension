@@ -1,11 +1,11 @@
 import { PROVIDER_LABELS, type ProviderCode } from '@/shared/settings';
 import { TRANSLATE_TEXT_ERROR_CODE } from '@/shared/translation';
-import type { TranslationProvider } from './types';
+import type { ProviderTranslateResult, TranslationProvider } from './types';
 
 export class UnsupportedProvider implements TranslationProvider {
   constructor(private readonly provider: ProviderCode) {}
 
-  async translate() {
+  translate(): ProviderTranslateResult {
     return {
       ok: false,
       error: {
@@ -13,6 +13,6 @@ export class UnsupportedProvider implements TranslationProvider {
         message: `${PROVIDER_LABELS[this.provider]} translations are not implemented yet.`,
         provider: this.provider,
       },
-    } as const;
+    };
   }
 }
