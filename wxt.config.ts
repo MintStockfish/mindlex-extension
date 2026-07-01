@@ -9,7 +9,11 @@ export default defineConfig({
       'Browser extension for AI-assisted translation and vocabulary capture.',
     version: '0.1',
     permissions: ['activeTab', 'contextMenus', 'storage'],
-    host_permissions: ['https://openrouter.ai/*'],
+    host_permissions: [
+      'https://openrouter.ai/*',
+      'https://api.openai.com/*',
+      'https://generativelanguage.googleapis.com/*',
+    ],
     action: {
       default_title: 'Mindlex Translator',
     },
