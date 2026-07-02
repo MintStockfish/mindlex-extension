@@ -1,5 +1,6 @@
 import type { ProviderCode } from '@/shared/settings';
 import type {
+  TranslateTextFailure,
   TranslateTextRequest,
   TranslateTextResponse,
 } from '@/shared/translation';
@@ -18,3 +19,16 @@ export type TranslationProviderConfig = {
   apiKey: string;
   modelId: string;
 };
+
+export type TranslationProviderRuntimeConfig = {
+  apiKey: string;
+  modelId: string;
+};
+
+export type ProviderResponseResult<TProviderResponse> =
+  | {
+      ok: true;
+      rawProviderResponse: unknown;
+      parsedProviderResponse: TProviderResponse;
+    }
+  | TranslateTextFailure;

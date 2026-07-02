@@ -1,6 +1,6 @@
-import type { TranslateTextFailure } from '@/shared/translation';
 import type { z } from 'zod';
 import type { openAIResponsesResponseSchema } from './openai.schemas';
+import type { ProviderResponseResult } from '../types';
 
 export type OpenAIProviderConfig = {
   apiKey: string;
@@ -14,12 +14,7 @@ export type OpenAIResponsesRequestBody = {
 };
 
 export type OpenAIResponsesResult =
-  | {
-      ok: true;
-      rawProviderResponse: unknown;
-      parsedProviderResponse: OpenAIResponsesResponse;
-    }
-  | TranslateTextFailure;
+  ProviderResponseResult<OpenAIResponsesResponse>;
 
 export type OpenAIResponsesResponse = z.infer<
   typeof openAIResponsesResponseSchema

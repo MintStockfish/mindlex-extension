@@ -1,6 +1,6 @@
-import type { TranslateTextFailure } from '@/shared/translation';
 import type { z } from 'zod';
 import type { geminiGenerateContentResponseSchema } from './gemini.schemas';
+import type { ProviderResponseResult } from '../types';
 
 export type GeminiProviderConfig = {
   apiKey: string;
@@ -22,12 +22,7 @@ export type GeminiGenerateContentRequestBody = {
 };
 
 export type GeminiGenerateContentResult =
-  | {
-      ok: true;
-      rawProviderResponse: unknown;
-      parsedProviderResponse: GeminiGenerateContentResponse;
-    }
-  | TranslateTextFailure;
+  ProviderResponseResult<GeminiGenerateContentResponse>;
 
 export type GeminiGenerateContentResponse = z.infer<
   typeof geminiGenerateContentResponseSchema

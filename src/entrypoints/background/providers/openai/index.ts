@@ -1,10 +1,13 @@
 import ky, { HTTPError } from 'ky';
-import { TRANSLATE_TEXT_ERROR_CODE } from '@/shared/translation';
 import {
   createTranslationInput,
   createTranslationInstructions,
 } from '../../translation/translationPrompt';
-import { validateProviderConfig } from '../validateProviderConfig';
+import { BaseTranslationProvider } from '../baseTranslationProvider';
+import {
+  createInvalidProviderResponseError,
+  createProviderRequestFailedError,
+} from '../providerErrors';
 import {
   OPENAI_REQUEST_TIMEOUT_MS,
   OPENAI_RESPONSES_URL,
@@ -19,58 +22,19 @@ import type {
   OpenAIResponsesResponse,
   OpenAIResponsesResult,
 } from './openai.types';
-import type {
-  ProviderTranslateInput,
-  ProviderTranslateResult,
-  TranslationProvider,
-} from '../types';
+import type { ProviderTranslateInput } from '../types';
 
-export class OpenAiProvider implements TranslationProvider {
-  constructor(private readonly config: OpenAIProviderConfig) {}
+export class OpenAiProvider extends BaseTranslationProvider<
+  OpenAIResponsesRequestBody,
+  OpenAIResponsesResponse
+> {
+  protected readonly provider = 'openai';
 
-  async translate(
-    input: ProviderTranslateInput,
-  ): Promise<ProviderTranslateResult> {
-    const configError = validateProviderConfig({
-      provider: 'openai',
-      ...this.config,
-    });
-
-    if (configError) {
-      return configError;
-    }
-
-    const body = this.createRequestBody(input);
-    const response = await this.fetchResponse(body);
-
-    if (!response.ok) {
-      return response;
-    }
-
-    const translatedText = getOpenAIOutputText(response.parsedProviderResponse);
-
-    if (!translatedText) {
-      return {
-        ok: false,
-        error: {
-          code: TRANSLATE_TEXT_ERROR_CODE.emptyProviderResponse,
-          message: 'OpenAI response did not include translated text.',
-          provider: 'openai',
-          modelId: this.config.modelId,
-        },
-      };
-    }
-
-    return {
-      ok: true,
-      translatedText,
-      provider: 'openai',
-      modelId: this.config.modelId,
-      rawProviderResponse: response.rawProviderResponse,
-    };
+  constructor(protected readonly config: OpenAIProviderConfig) {
+    super();
   }
 
-  private createRequestBody(
+  protected createRequestBody(
     input: ProviderTranslateInput,
   ): OpenAIResponsesRequestBody {
     return {
@@ -80,7 +44,7 @@ export class OpenAiProvider implements TranslationProvider {
     };
   }
 
-  private async fetchResponse(
+  protected async fetchProviderResponse(
     body: OpenAIResponsesRequestBody,
   ): Promise<OpenAIResponsesResult> {
     try {
@@ -102,15 +66,10 @@ export class OpenAiProvider implements TranslationProvider {
         openAIResponsesResponseSchema.safeParse(rawProviderResponse);
 
       if (!parsedProviderResponse.success) {
-        return {
-          ok: false,
-          error: {
-            code: TRANSLATE_TEXT_ERROR_CODE.invalidProviderResponse,
-            message: 'OpenAI response has unexpected format.',
-            provider: 'openai',
-            modelId: this.config.modelId,
-          },
-        };
+        return createInvalidProviderResponseError({
+          provider: this.provider,
+          modelId: this.config.modelId,
+        });
       }
 
       return {
@@ -120,43 +79,33 @@ export class OpenAiProvider implements TranslationProvider {
       };
     } catch (error) {
       if (error instanceof HTTPError) {
-        return {
-          ok: false,
-          error: {
-            code: TRANSLATE_TEXT_ERROR_CODE.providerRequestFailed,
-            message: `OpenAI request failed with status ${error.response.status}.`,
-            provider: 'openai',
-            modelId: this.config.modelId,
-          },
-        };
+        return createProviderRequestFailedError({
+          provider: this.provider,
+          modelId: this.config.modelId,
+          status: error.response.status,
+        });
       }
 
-      return {
-        ok: false,
-        error: {
-          code: TRANSLATE_TEXT_ERROR_CODE.providerRequestFailed,
-          message: 'OpenAI request failed.',
-          provider: 'openai',
-          modelId: this.config.modelId,
-        },
-      };
+      return createProviderRequestFailedError({
+        provider: this.provider,
+        modelId: this.config.modelId,
+      });
     }
   }
-}
 
-function getOpenAIOutputText(response: OpenAIResponsesResponse): string {
-  const outputText = response.output_text?.trim();
+  protected extractTranslatedText(response: OpenAIResponsesResponse): string {
+    const outputText = response.output_text;
 
-  if (outputText) {
-    return outputText;
+    if (outputText) {
+      return outputText;
+    }
+
+    return (
+      response.output
+        ?.flatMap((outputItem) => outputItem.content ?? [])
+        .filter((contentItem) => contentItem.type === 'output_text')
+        .map((contentItem) => contentItem.text ?? '')
+        .join('') ?? ''
+    );
   }
-
-  return (
-    response.output
-      ?.flatMap((outputItem) => outputItem.content ?? [])
-      .filter((contentItem) => contentItem.type === 'output_text')
-      .map((contentItem) => contentItem.text ?? '')
-      .join('')
-      .trim() ?? ''
-  );
 }
