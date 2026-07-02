@@ -1,6 +1,7 @@
 import type { ExtensionSettings } from '@/shared/settings';
+import { GeminiProvider } from './gemini';
+import { OpenAiProvider } from './openai';
 import { OpenRouterProvider } from './openrouter';
-import { UnsupportedProvider } from './unsupportedProvider';
 import type { TranslationProvider } from './types';
 
 type TranslationProviderSettings = Pick<
@@ -16,9 +17,9 @@ export function createTranslationProvider(
       return new OpenRouterProvider(settings.providers.openrouter);
 
     case 'openai':
-      return new UnsupportedProvider('openai');
+      return new OpenAiProvider(settings.providers.openai);
 
     case 'gemini':
-      return new UnsupportedProvider('gemini');
+      return new GeminiProvider(settings.providers.gemini);
   }
 }

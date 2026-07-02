@@ -1,7 +1,7 @@
 import type { ChatCompletionMessage } from '../../translation/translationPrompt';
-import type { TranslateTextFailure } from '@/shared/translation';
 import type { z } from 'zod';
 import type { openRouterChatCompletionResponseSchema } from './openrouter.schemas';
+import type { ProviderResponseResult } from '../types';
 
 export type OpenRouterProviderConfig = {
   apiKey: string;
@@ -15,12 +15,7 @@ export type OpenRouterChatCompletionRequestBody = {
 };
 
 export type OpenRouterChatCompletionResult =
-  | {
-      ok: true;
-      rawProviderResponse: unknown;
-      parsedProviderResponse: OpenRouterChatCompletionResponse;
-    }
-  | TranslateTextFailure;
+  ProviderResponseResult<OpenRouterChatCompletionResponse>;
 
 export type OpenRouterChatCompletionResponse = z.infer<
   typeof openRouterChatCompletionResponseSchema

@@ -1,7 +1,10 @@
 import ky, { HTTPError } from 'ky';
-import { TRANSLATE_TEXT_ERROR_CODE } from '@/shared/translation';
 import { createTranslationMessages } from '../../translation/translationPrompt';
-import { validateProviderConfig } from '../validateProviderConfig';
+import { BaseTranslationProvider } from '../baseTranslationProvider';
+import {
+  createInvalidProviderResponseError,
+  createProviderRequestFailedError,
+} from '../providerErrors';
 import {
   OPENROUTER_CHAT_COMPLETIONS_URL,
   OPENROUTER_REQUEST_TIMEOUT_MS,
@@ -16,60 +19,19 @@ import type {
   OpenRouterProviderConfig,
 } from './openrouter.types';
 import { openRouterChatCompletionResponseSchema } from './openrouter.schemas';
-import type {
-  ProviderTranslateInput,
-  ProviderTranslateResult,
-  TranslationProvider,
-} from '../types';
+import type { ProviderTranslateInput } from '../types';
 
-export class OpenRouterProvider implements TranslationProvider {
-  constructor(private readonly config: OpenRouterProviderConfig) {}
+export class OpenRouterProvider extends BaseTranslationProvider<
+  OpenRouterChatCompletionRequestBody,
+  OpenRouterChatCompletionResponse
+> {
+  protected readonly provider = 'openrouter';
 
-  async translate(
-    input: ProviderTranslateInput,
-  ): Promise<ProviderTranslateResult> {
-    const configError = validateProviderConfig({
-      provider: 'openrouter',
-      ...this.config,
-    });
-
-    if (configError) {
-      return configError;
-    }
-
-    const body = this.createRequestBody(input);
-    const response = await this.fetchChatCompletion(body);
-
-    if (!response.ok) {
-      return response;
-    }
-
-    const translatedText = getOpenRouterMessageContent(
-      response.parsedProviderResponse,
-    );
-
-    if (!translatedText) {
-      return {
-        ok: false,
-        error: {
-          code: TRANSLATE_TEXT_ERROR_CODE.emptyProviderResponse,
-          message: 'OpenRouter response did not include translated text.',
-          provider: 'openrouter',
-          modelId: this.config.modelId,
-        },
-      };
-    }
-
-    return {
-      ok: true,
-      translatedText,
-      provider: 'openrouter',
-      modelId: this.config.modelId,
-      rawProviderResponse: response.rawProviderResponse,
-    };
+  constructor(protected readonly config: OpenRouterProviderConfig) {
+    super();
   }
 
-  private createRequestBody(
+  protected createRequestBody(
     input: ProviderTranslateInput,
   ): OpenRouterChatCompletionRequestBody {
     return {
@@ -79,7 +41,7 @@ export class OpenRouterProvider implements TranslationProvider {
     };
   }
 
-  private async fetchChatCompletion(
+  protected async fetchProviderResponse(
     body: OpenRouterChatCompletionRequestBody,
   ): Promise<OpenRouterChatCompletionResult> {
     try {
@@ -101,15 +63,10 @@ export class OpenRouterProvider implements TranslationProvider {
         openRouterChatCompletionResponseSchema.safeParse(rawProviderResponse);
 
       if (!parsedProviderResponse.success) {
-        return {
-          ok: false,
-          error: {
-            code: TRANSLATE_TEXT_ERROR_CODE.invalidProviderResponse,
-            message: 'OpenRouter response has unexpected format.',
-            provider: 'openrouter',
-            modelId: this.config.modelId,
-          },
-        };
+        return createInvalidProviderResponseError({
+          provider: this.provider,
+          modelId: this.config.modelId,
+        });
       }
 
       return {
@@ -119,32 +76,23 @@ export class OpenRouterProvider implements TranslationProvider {
       };
     } catch (error) {
       if (error instanceof HTTPError) {
-        return {
-          ok: false,
-          error: {
-            code: TRANSLATE_TEXT_ERROR_CODE.providerRequestFailed,
-            message: `OpenRouter request failed with status ${error.response.status}.`,
-            provider: 'openrouter',
-            modelId: this.config.modelId,
-          },
-        };
+        return createProviderRequestFailedError({
+          provider: this.provider,
+          modelId: this.config.modelId,
+          status: error.response.status,
+        });
       }
 
-      return {
-        ok: false,
-        error: {
-          code: TRANSLATE_TEXT_ERROR_CODE.providerRequestFailed,
-          message: 'OpenRouter request failed.',
-          provider: 'openrouter',
-          modelId: this.config.modelId,
-        },
-      };
+      return createProviderRequestFailedError({
+        provider: this.provider,
+        modelId: this.config.modelId,
+      });
     }
   }
-}
 
-function getOpenRouterMessageContent(
-  response: OpenRouterChatCompletionResponse,
-): string {
-  return response.choices[0]?.message.content.trim() ?? '';
+  protected extractTranslatedText(
+    response: OpenRouterChatCompletionResponse,
+  ): string {
+    return response.choices[0]?.message.content ?? '';
+  }
 }
