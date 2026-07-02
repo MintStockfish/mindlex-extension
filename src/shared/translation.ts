@@ -9,9 +9,13 @@ export type TranslateTextRequest = {
   targetLanguage: LanguageCode;
 };
 
+export type TranslateTextMessagePayload = {
+  text: string;
+};
+
 export type TranslateTextMessage = {
   type: typeof TRANSLATE_TEXT_MESSAGE;
-  payload: TranslateTextRequest;
+  payload: TranslateTextMessagePayload;
 };
 
 export const TRANSLATE_TEXT_ERROR_CODE = {
@@ -48,14 +52,3 @@ export type TranslateTextFailure = {
 };
 
 export type TranslateTextResponse = TranslateTextSuccess | TranslateTextFailure;
-
-export function isTranslateTextMessage(
-  message: unknown,
-): message is TranslateTextMessage {
-  return (
-    typeof message === 'object' &&
-    message !== null &&
-    'type' in message &&
-    message.type === TRANSLATE_TEXT_MESSAGE
-  );
-}
