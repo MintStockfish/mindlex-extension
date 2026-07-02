@@ -1,10 +1,10 @@
 import { getSettings } from '@/shared/storage/extensionSettings';
 import {
-  isTranslateTextMessage,
   TRANSLATE_TEXT_ERROR_CODE,
-  type TranslateTextRequest,
+  type TranslateTextMessagePayload,
   type TranslateTextResponse,
 } from '@/shared/translation';
+import { isTranslateTextMessage } from '@/shared/translationMessageSchema';
 import { translateText } from './translation/translateText';
 
 export default defineBackground(() => {
@@ -22,12 +22,19 @@ export default defineBackground(() => {
 });
 
 async function handleTranslateTextMessage(
-  request: TranslateTextRequest,
+  request: TranslateTextMessagePayload,
 ): Promise<TranslateTextResponse> {
   try {
     const settings = await getSettings();
 
-    return translateText(request, settings);
+    return translateText(
+      {
+        text: request.text,
+        sourceLanguage: settings.sourceLanguage,
+        targetLanguage: settings.targetLanguage,
+      },
+      settings,
+    );
   } catch {
     return {
       ok: false,
